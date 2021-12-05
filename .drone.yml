@@ -1,0 +1,39 @@
+kind: pipeline
+name: url-shortener
+
+steps:
+  - name: build-web
+    image: plugins/docker
+    settings:
+      repo: docker.murbal.me/run-calc/web
+      registry: docker.murbal.me
+      dockerfile: ./docker/web/Dockerfile
+      username:
+        from_secret: DOCKER_REGISTRY_USER_NAME
+      password:
+        from_secret: DOCKER_REGISTRY_PASSWORD
+  - name: deploy
+    image: appleboy/drone-ssh
+    environment:
+      DOCKER_REGISTRY_USER_NAME:
+        from_secret: DOCKER_REGISTRY_USER_NAME
+      DOCKER_REGISTRY_PASSWORD:
+        from_secret: DOCKER_REGISTRY_PASSWORD
+    settings:
+      host: murbal.me
+      username: root
+      password:
+        from_secret: SSH_ROOT_PASSWORD
+      envs:
+        [
+          DOCKER_REGISTRY_USER_NAME,
+          DOCKER_REGISTRY_PASSWORD,
+        ]
+      script:
+        - export DOCKER_REGISTRY_USER_NAME=$DOCKER_REGISTRY_USER_NAME
+        - export DOCKER_REGISTRY_PASSWORD=$DOCKER_REGISTRY_PASSWORD
+        - docker login docker.murbal.me --username $${DOCKER_REGISTRY_USER_NAME} --password $${DOCKER_REGISTRY_PASSWORD}
+        - docker pull docker.murbal.me/run-calc/web
+        - docker stop run-calc-web
+        - docker rm run-calc-web
+        - docker run -d --network run-calc --name run-calc-web -p 127.0.0.1:8110:80 docker.murbal.me/run-calc/web
