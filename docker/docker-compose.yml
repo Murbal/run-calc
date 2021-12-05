@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  run-calc-client:
+    image: node:16
+    working_dir: /code
+    volumes:
+      - ../client:/code
+      - ./install-pnpm:/scripts/install-pnpm
+      - ./pnpm-v6.16.js:/scripts/pnpm-v6.16.js
+    ports:
+      - "3000:3000"
+    command: sh -c "/scripts/install-pnpm && pnpm install && pnpm dev -- --host"
