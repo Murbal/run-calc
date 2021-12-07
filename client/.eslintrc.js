@@ -1,5 +1,6 @@
-/** @type {import("eslint").Linter.Config} */
+/** @type {import("@types/eslint/index").Linter.Config} */
 module.exports = {
+  ignorePatterns: ['*.js'],
   env: {
     browser: true,
     es2021: true,
@@ -8,6 +9,8 @@ module.exports = {
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:react-hooks/recommended',
+    'plugin:react/jsx-runtime',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -16,6 +19,11 @@ module.exports = {
     },
     ecmaVersion: 13,
     sourceType: 'module',
+  },
+  settings: {
+    react: {
+      version: 'detect',
+    },
   },
   plugins: ['react', '@typescript-eslint'],
   rules: {},
